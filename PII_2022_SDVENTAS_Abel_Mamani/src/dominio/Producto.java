@@ -160,20 +160,28 @@ public class Producto {
 		return precioMasReciente.getValor();
 	}
 	
-	public ArrayList<Precio> getPrecioPorFecha(Calendar fechaExacta){
-		ArrayList<Precio> salida = new ArrayList<Precio>();
-		SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
-		boolean existeFecha = misPrecios.stream().
-				filter(p->p.getFechaHastaConFormato().equals(sdf.format(fechaExacta.getTime()))).
-				findFirst().isPresent();
-		if(existeFecha){
-			salida =  misPrecios.stream()
-					.filter(pr1->pr1.getFechaHastaConFormato().equals(sdf.format(fechaExacta.getTime())))
-					.collect(Collectors.toCollection(ArrayList<Precio>::new));
-		}
-			
-		return salida;
-	}
+	public ArrayList<Precio> getPreciosPorFecha(Calendar fechaExacta) {
+        ArrayList<Precio> salida = new ArrayList<Precio>();
+        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+        
+        boolean existeFecha = existePrecioParaFechaExacta(fechaExacta, sdf);
+
+        if (existeFecha) {
+            salida = obtenerPreciosParaFechaExacta(fechaExacta, sdf);
+        }
+        return salida;
+    }
+
+    private boolean existePrecioParaFechaExacta(Calendar fechaExacta, SimpleDateFormat sdf) {
+        return misPrecios.stream()
+                .anyMatch(p -> p.tieneFechaHastaConFormato(sdf.format(fechaExacta.getTime())));
+    }
+
+    private ArrayList<Precio> obtenerPreciosParaFechaExacta(Calendar fechaExacta, SimpleDateFormat sdf) {
+        return misPrecios.stream()
+                .filter(p -> p.tieneFechaHastaConFormato(sdf.format(fechaExacta.getTime())))
+                .collect(Collectors.toCollection(ArrayList<Precio>::new));
+    }
 	
 	//metodos de stock
 	public void setStock(int valor) throws ExceptionProducto{
