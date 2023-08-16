@@ -18,13 +18,26 @@ public class Detalle {
 	private int codigoProducto;
 	private double precio;
 	private int cantidad;
-	public Detalle(int codigoProducto, double precio, int cantidad) throws ExceptionDetalle{
-		if(validarCodigoProducto(codigoProducto))
-			this.codigoProducto = codigoProducto;
-		if(validarPrecio(precio))
-			this.precio = precio;
-		if(validarCantidad(cantidad))
-			this.cantidad = cantidad;
+
+	public Detalle(int codigoProducto, double precio, int cantidad) throws ExceptionDetalle {
+        validarDetalle(codigoProducto, precio, cantidad);
+    	}
+
+    	private void validarDetalle(int codigoProducto, double precio, int cantidad) throws ExceptionDetalle {
+        validarCodigoProducto(codigoProducto);
+        validarPrecio(precio);
+        validarCantidad(cantidad);
+
+        asignarDetalle(codigoProducto, precio, cantidad);
+    	}
+
+	private void asignarDetalle(int codigoProducto, double precio, int cantidad) {
+        this.codigoProducto = codigoProducto;
+        this.precio = precio;
+        this.cantidad = cantidad;
+    	}
+
+	
 	}
 	private boolean validarCodigoProducto(int idProducto) throws ExceptionDetalle{
 		if(idProducto < 0)
