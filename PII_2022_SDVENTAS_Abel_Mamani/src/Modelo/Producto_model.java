@@ -79,50 +79,46 @@ public class Producto_model {
 		}
 	}
 	
-	public boolean modificarProducto(int idProducto, String nombre, String marca, String tipo, String desc, int stock, double precio	) throws ExceptionProducto, ExceptionPrecio{   
-    	boolean salida = false;
-    	GestorDeVentas gv = GestorDeVentas.getInstancia();
-    	gv.Limpiar();
-    	Producto p = new Producto(idProducto, nombre,Marca.valueOf(marca),TipoDeProducto.valueOf(tipo), desc, stock, precio);
-    	gv.addProducto(p);
-    	gv.Limpiar();
-    	String query = "UPDATE producto SET nombre = '"+nombre+"', marca = '"+marca+"', tipoProducto = '"+tipo+"', descripcion = '"+desc+"', stock = '"+stock+"' WHERE idProducto = '"+idProducto+"'"; 
-		
-		try {
-			Connection conectar = conexion.conectar();
-			PreparedStatement actualizar = conectar.prepareStatement(query);
-			if(actualizar.execute(query)) {
-				salida = false;
-				System.out.println("no se actualizo");
-	    	}else {
-	    		conexion.cerrarConexion();
-	    		Producto nuevo = this.getProducto();
-	    		if(nuevo != null) {
-	    			int codPrecio = getCodPrecioActual(nuevo.getCodigoProducto());
-	    			double valorPrecio = getPrecioActual(nuevo.getCodigoProducto());
-	    			if(codPrecio > 0) {
-	    				if(valorPrecio != precio) {
-	    					if(registrarPrecio(nuevo.getCodigoProducto(), precio)) {
-	    						if(updatePrecioActual(codPrecio)) {
-	    							salida = true;
-	    						}
-	    					}
-	    					
-	    				}else {
-	    					salida = true;
-	    				}
-	    				
-	    			}
-	    		}
-	    	}
-			
-	    	
-			return salida;
-		}catch(SQLException e) {
-			System.out.println("Error: " +e);
-			return false;
-		}
-	}
+	public boolean modificarProducto(int idProducto, String nombre, String marca, String tipo, String desc, int stock, double precio) throws ExceptionProducto, ExceptionPrecio {
+    boolean salida = false;
+    GestorDeVentas gv = GestorDeVentas.getInstancia();
+    gv.Limpiar();
+    Producto p = new Producto(idProducto, nombre, Marca.valueOf(marca), TipoDeProducto.valueOf(tipo), desc, stock, precio);
+    gv.addProducto(p);
+    gv.Limpiar();
+    String query = "UPDATE producto SET nombre = '" + nombre + "', marca = '" + marca + "', tipoProducto = '" + tipo + "', descripcion = '" + desc + "', stock = '" + stock + "' WHERE idProducto = '" + idProducto + "'";
+
+    try {
+        Connection conectar = conexion.conectar();
+        PreparedStatement actualizar = conectar.prepareStatement(query);
+        if (actualizar.execute(query)) {
+            salida = false;
+            System.out.println("no se actualizo");
+        } else {
+            conexion.cerrarConexion();
+            Producto nuevo = this.getProducto();
+            if (nuevo != null) {
+                int codPrecio = getCodPrecioActual(nuevo.getCodigoProducto());
+                double valorPrecio = getPrecioActual(nuevo.getCodigoProducto());
+                boolean debeActualizarPrecio = valorPrecio != precio;
+
+                if (codPrecio > 0 && debeActualizarPrecio) {
+                    if (registrarPrecio(nuevo.getCodigoProducto(), precio) && updatePrecioActual(codPrecio)) {
+                        salida = true;
+                    }
+                } else {
+                    salida = true;
+                }
+            }
+        }
+
+        return salida;
+    } catch (SQLException e) {
+        System.out.println("Error: " + e);
+        return salida;
+    }
+}
+
 	
 	public Producto getProducto(int idProducto){   
 		String query = "SELECT * FROM producto WHERE estado = 1 AND idProducto = '"+idProducto+"'"; 
